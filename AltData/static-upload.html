@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Block Roots - Upload GEDCOM Demo</title>
+  <style>
+    :root {
+      --primary-color: #F2C94C; /* Yellow accent */
+      --secondary-color: #141414; /* Dark background */
+      --tertiary-color: #1E2E4D; /* Dark blue for feature boxes */
+      --text-color: #FFFFFF;
+      --link-hover-color: #F9E29C;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+    }
+    
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: var(--secondary-color);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .btn {
+      padding: 0.5rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      border: none;
+      text-decoration: none;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .upload-container {
+      background-color: var(--tertiary-color);
+      padding: 2rem;
+      border-radius: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #444;
+      border-radius: 4px;
+      background-color: #2C3E50;
+      color: var(--text-color);
+    }
+    
+    .blockchain-storage {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    
+    .progress-bar-container {
+      background-color: #444;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    .progress-bar {
+      width: 0%;
+      background-color: var(--primary-color);
+      height: 10px;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">My Block Roots</div>
+    <div class="nav-links">
+      <a href="static-demo.html">Home</a>
+      <a href="#about">About</a>
+      <a href="static-upload.html">Upload GEDCOM</a>
+      <a href="static-tree.html">Family Tree</a>
+    </div>
+    <div class="auth-buttons">
+      <span style="color: var(--primary-color); margin-right: 15px;">Welcome, DemoUser</span>
+      <a href="#logout" class="btn btn-outline">Logout</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <h1>Upload GEDCOM File</h1>
+    
+    <div class="upload-container">
+      <p>Upload your GEDCOM file to visualize your family tree and optionally store it on the blockchain.</p>
+      
+      <form id="uploadForm">
+        <div class="form-group">
+          <label for="gedcom-file" class="form-label">Select GEDCOM File</label>
+          <input 
+            type="file" 
+            id="gedcom-file" 
+            accept=".ged,.gedcom"
+            class="form-input"
+          />
+        </div>
+        
+        <div class="progress-bar-container">
+          <div 
+            class="progress-bar" 
+            id="progress-bar"
+          ></div>
+          <p style="text-align: center; margin-top: 0.5rem;"><span id="progress-text">0</span>% Uploaded</p>
+        </div>
+        
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          style="width: 100%; margin-bottom: 1rem;"
+        >
+          Upload and Visualize
+        </button>
+      </form>
+      
+      <div class="blockchain-storage">
+        <h3 style="color: var(--primary-color)">Permanent Blockchain Storage</h3>
+        <p>After uploading, you can choose to permanently store your family tree on the blockchain for future generations.</p>
+        <button 
+          class="btn btn-outline" 
+          id="blockchain-btn"
+          style="margin-top: 1rem;"
+        >
+          Save to Blockchain
+        </button>
+        <p style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.7;">
+          We use Arweave for permanent storage and Polygon for recording transactions.
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const uploadForm = document.getElementById('uploadForm');
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+      const blockchainBtn = document.getElementById('blockchain-btn');
+      
+      uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('gedcom-file');
+        if (!fileInput.files[0]) {
+          alert('Please select a file to upload');
+          return;
+        }
+        
+        // Simulate upload progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 5;
+          progressBar.style.width = `${progress}%`;
+          progressText.textContent = progress;
+          
+          if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+              alert('Upload complete! Redirecting to Family Tree page...');
+              window.location.href = 'static-tree.html';
+            }, 500);
+          }
+        }, 200);
+      });
+      
+      blockchainBtn.addEventListener('click', function() {
+        alert('In the full application, this would save your family tree to the blockchain using Arweave and Polygon.');
+      });
+    });
+  </script>
+</body>
+</html> 

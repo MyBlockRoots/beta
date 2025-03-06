@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Block Roots - Family Tree Demo</title>
+  <style>
+    :root {
+      --primary-color: #F2C94C; /* Yellow accent */
+      --secondary-color: #141414; /* Dark background */
+      --tertiary-color: #1E2E4D; /* Dark blue for feature boxes */
+      --text-color: #FFFFFF;
+      --link-hover-color: #F9E29C;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+    }
+    
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: var(--secondary-color);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-links a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .btn {
+      padding: 0.5rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: var(--secondary-color);
+      border: none;
+      text-decoration: none;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    .diagram-container {
+      width: 70%;
+      height: 600px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: var(--tertiary-color);
+      position: relative;
+    }
+    
+    .tree-node {
+      width: 150px;
+      height: 100px;
+      background-color: var(--tertiary-color);
+      border: 2px solid var(--primary-color);
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .tree-node:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+    
+    .tree-node h3 {
+      margin: 0;
+      color: var(--primary-color);
+      font-size: 1rem;
+    }
+    
+    .tree-node p {
+      margin: 5px 0 0 0;
+      font-size: 0.8rem;
+      color: #CCC;
+    }
+    
+    .tree-link {
+      position: absolute;
+      background-color: var(--primary-color);
+      height: 2px;
+      transform-origin: left center;
+    }
+    
+    .details-panel {
+      width: 28%;
+      background-color: var(--tertiary-color);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    
+    .flex-container {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .buttons-container {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">My Block Roots</div>
+    <div class="nav-links">
+      <a href="static-demo.html">Home</a>
+      <a href="#about">About</a>
+      <a href="static-upload.html">Upload GEDCOM</a>
+      <a href="static-tree.html">Family Tree</a>
+    </div>
+    <div class="auth-buttons">
+      <span style="color: var(--primary-color); margin-right: 15px;">Welcome, DemoUser</span>
+      <a href="#logout" class="btn btn-outline">Logout</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <h1>Family Tree</h1>
+    
+    <div class="buttons-container">
+      <button class="btn btn-primary" id="add-person-btn">Add Person</button>
+      <button class="btn btn-outline" id="save-blockchain-btn">Save to Blockchain</button>
+    </div>
+    
+    <div class="flex-container">
+      <div class="diagram-container" id="tree-diagram">
+        <!-- Tree nodes will be inserted here by JavaScript -->
+      </div>
+      
+      <div class="details-panel" id="details-panel">
+        <h3 style="color: var(--primary-color)">Person Details</h3>
+        <div id="person-details">
+          <p>Select a person to view details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sample family tree data
+      const treeData = {
+        nodes: [
+          { id: 'person1', name: 'John Smith', gender: 'male', birthDate: '1950-01-01', x: 300, y: 100 },
+          { id: 'person2', name: 'Jane Smith', gender: 'female', birthDate: '1952-05-10', x: 500, y: 100 },
+          { id: 'person3', name: 'Michael Smith', gender: 'male', birthDate: '1975-08-23', x: 400, y: 250 }
+        ],
+        links: [
+          { source: 'person1', target: 'person2', relationship: 'spouse' },
+          { source: 'person1', target: 'person3', relationship: 'parent-child' },
+          { source: 'person2', target: 'person3', relationship: 'parent-child' }
+        ]
+      };
+      
+      const treeDiagram = document.getElementById('tree-diagram');
+      const detailsPanel = document.getElementById('person-details');
+      const addPersonBtn = document.getElementById('add-person-btn');
+      const saveBlockchainBtn = document.getElementById('save-blockchain-btn');
+      
+      // Render the tree nodes
+      function renderTree() {
+        treeDiagram.innerHTML = '';
+        
+        // First create nodes
+        treeData.nodes.forEach(node => {
+          const nodeElement = document.createElement('div');
+          nodeElement.className = 'tree-node';
+          nodeElement.id = node.id;
+          nodeElement.style.left = `${node.x}px`;
+          nodeElement.style.top = `${node.y}px`;
+          
+          const nameElement = document.createElement('h3');
+          nameElement.textContent = node.name;
+          
+          const dateElement = document.createElement('p');
+          dateElement.textContent = node.birthDate;
+          
+          nodeElement.appendChild(nameElement);
+          nodeElement.appendChild(dateElement);
+          
+          nodeElement.addEventListener('click', () => {
+            showPersonDetails(node);
+          });
+          
+          treeDiagram.appendChild(nodeElement);
+        });
+        
+        // Then create links
+        treeData.links.forEach(link => {
+          const sourceNode = document.getElementById(link.source);
+          const targetNode = document.getElementById(link.target);
+          
+          if (sourceNode && targetNode) {
+            const sourceRect = sourceNode.getBoundingClientRect();
+            const targetRect = targetNode.getBoundingClientRect();
+            const diagramRect = treeDiagram.getBoundingClientRect();
+            
+            const sourceX = sourceNode.offsetLeft + sourceNode.offsetWidth / 2;
+            const sourceY = sourceNode.offsetTop + sourceNode.offsetHeight;
+            const targetX = targetNode.offsetLeft + targetNode.offsetWidth / 2;
+            const targetY = targetNode.offsetTop;
+            
+            const dx = targetX - sourceX;
+            const dy = targetY - sourceY;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            const linkElement = document.createElement('div');
+            linkElement.className = 'tree-link';
+            linkElement.style.width = `${length}px`;
+            linkElement.style.left = `${sourceX}px`;
+            linkElement.style.top = `${sourceY}px`;
+            linkElement.style.transform = `rotate(${angle}deg)`;
+            
+            treeDiagram.appendChild(linkElement);
+          }
+        });
+      }
+      
+      // Show person details in the side panel
+      function showPersonDetails(person) {
+        detailsPanel.innerHTML = `
+          <p><strong>Name:</strong> ${person.name}</p>
+          <p><strong>Birth Date:</strong> ${person.birthDate}</p>
+          <p><strong>Gender:</strong> ${person.gender}</p>
+        `;
+      }
+      
+      // Add a new person to the family tree
+      addPersonBtn.addEventListener('click', function() {
+        const newPersonId = `person${treeData.nodes.length + 1}`;
+        const newPerson = {
+          id: newPersonId,
+          name: 'New Person',
+          gender: 'unknown',
+          birthDate: '',
+          x: 300,
+          y: 400
+        };
+        
+        treeData.nodes.push(newPerson);
+        renderTree();
+        alert('Added a new person to the family tree!');
+      });
+      
+      // Save to blockchain button
+      saveBlockchainBtn.addEventListener('click', function() {
+        alert('In the full application, this would save your family tree to the blockchain using Arweave and Polygon.');
+      });
+      
+      // Initial render
+      renderTree();
+    });
+  </script>
+</body>
+</html> 
